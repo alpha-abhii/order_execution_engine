@@ -1,6 +1,7 @@
 import Fastify, { FastifyInstance } from 'fastify';
 import cors from '@fastify/cors';
 import websocket from '@fastify/websocket';
+import { orderRoutes } from './routes/order.routes';
 
 
 export async function buildServer(): Promise<FastifyInstance> {
@@ -25,6 +26,8 @@ export async function buildServer(): Promise<FastifyInstance> {
     server.get('/ping', async (request, reply) => {
         return { status: 'ok' , timeStamp: new Date().toISOString()};
     });
+
+    await server.register(orderRoutes, { prefix: '/api/orders' });
 
     return server;
 }
