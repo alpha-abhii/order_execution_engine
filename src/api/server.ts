@@ -2,6 +2,7 @@ import Fastify, { FastifyInstance } from 'fastify';
 import cors from '@fastify/cors';
 import websocket from '@fastify/websocket';
 import { orderRoutes } from './routes/order.routes';
+import { websocketRoutes } from './routes/websocket.routes';
 
 
 export async function buildServer(): Promise<FastifyInstance> {
@@ -28,6 +29,7 @@ export async function buildServer(): Promise<FastifyInstance> {
     });
 
     await server.register(orderRoutes, { prefix: '/api/orders' });
+    await server.register(websocketRoutes);
 
     return server;
 }
