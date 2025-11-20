@@ -1,0 +1,41 @@
+generator client {
+  provider = "prisma-client"
+  output   = "../generated/prisma"
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+
+enum OrderStatus {
+  PENDING
+  ROUTING
+  SUBMITTED
+  CONFIRMED
+  FAILED
+}
+
+model Order {
+  id        String   @id @default(uuid())
+  
+  // Market Order Input
+  inputToken  String
+  outputToken String
+  amount      Float
+  
+  // Execution State
+  status      OrderStatus @default(PENDING)
+  
+  // Routing Details (filled by Worker)
+  selectedDex String?
+  executedPrice Float?
+  txHash      String?
+  failureReason String?
+  
+  // Timestamps
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  @@map("orders")
+}
