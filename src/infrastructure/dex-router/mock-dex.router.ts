@@ -1,6 +1,5 @@
 import { IDexRouter, Quote, SwapResult } from '../../core/interfaces/dex-router.interface';
 
-// Helper: Simulates network latency
 const delay = (ms: number) => new Promise((resolve) => setTimeout(resolve, ms));
 
 export class MockDexRouter implements IDexRouter {
@@ -9,8 +8,8 @@ export class MockDexRouter implements IDexRouter {
 
         const basePrice = 150 + (Math.random() * 5);
 
-        const raydiumPrice = basePrice * (1 + (Math.random() * 0.02)); // 0-2% variance
-        const meteoraPrice = basePrice * (1 - (Math.random() * 0.03)); // 0-3% variance
+        const raydiumPrice = basePrice * (1 + (Math.random() * 0.02));
+        const meteoraPrice = basePrice * (1 - (Math.random() * 0.03));
 
         return [
             { dex: 'Raydium', price: raydiumPrice, fee: 0.003 },
@@ -19,6 +18,11 @@ export class MockDexRouter implements IDexRouter {
     }
 
     async executeSwap(dex: string, tokenIn: string, amount: number): Promise<SwapResult> {
+        const supportedDexs = ['Raydium', 'Meteora'];
+        if (!supportedDexs.includes(dex)) {
+            throw new Error(`Unknown DEX: ${dex}`);
+        }
+
         await delay(2000 + Math.random() * 1000);
 
         const shouldFail = Math.random() < 0.1;
