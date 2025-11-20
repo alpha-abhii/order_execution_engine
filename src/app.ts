@@ -1,6 +1,7 @@
 import dotenv from 'dotenv';
 dotenv.config();
 
+import './workers/order.worker';
 import { buildServer } from './api/server';
 
 const PORT = process.env.PORT ? parseInt(process.env.PORT) : 3000;
