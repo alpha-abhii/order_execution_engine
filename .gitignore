@@ -156,6 +156,9 @@ coverage/
 pgdata/
 redisdata/
 
+# Docker Config Files (Added for security)
+redis.conf
+
 # IDEs
 .vscode/
 .idea/
