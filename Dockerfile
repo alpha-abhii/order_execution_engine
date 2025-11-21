@@ -8,13 +8,13 @@ COPY prisma ./prisma/
 
 RUN npm install
 
-RUN npx prisma generate
-
 COPY tsconfig.json ./
 COPY src ./src
+
+RUN npx prisma generate
+
 RUN npm run build
 
-# --- Stage 2: Runner (Production) ---
 FROM node:22-alpine
 
 WORKDIR /app
@@ -26,9 +26,8 @@ COPY --from=builder /app/dist ./dist
 
 COPY --from=builder /app/prisma ./prisma
 
-COPY --from=builder /app/generated ./generated
+COPY --from=builder /app/src/generated ./dist/generated
 
-# 5. Setup Env
 ENV NODE_ENV=production
 EXPOSE 3000
 
