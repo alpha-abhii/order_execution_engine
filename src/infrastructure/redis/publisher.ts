@@ -1,12 +1,15 @@
 import Redis from 'ioredis';
 import 'dotenv/config';
 
-
-export const redisPublisher = new Redis({
-    host: process.env.REDIS_HOST || 'localhost',
-    port: process.env.REDIS_PORT ? parseInt(process.env.REDIS_PORT, 10) : 6379,
-    password: process.env.REDIS_PASSWORD || undefined,
-});
+export const redisPublisher = process.env.REDIS_URL 
+    ? new Redis(process.env.REDIS_URL) 
+    : new Redis({
+        host: process.env.REDIS_HOST || 'localhost',
+        port: process.env.REDIS_PORT && !isNaN(parseInt(process.env.REDIS_PORT))
+            ? parseInt(process.env.REDIS_PORT)
+            : 6379,
+        password: process.env.REDIS_PASSWORD || undefined,
+    });
 
 export async function publishOrderUpdate(orderId: string, status: string, data: any = {}) {
     const channel = `updates:${orderId}`;
