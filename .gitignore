@@ -165,3 +165,5 @@ redis.conf
 /src/generated/prisma
 
 /generated/prisma
+
+generated/ 

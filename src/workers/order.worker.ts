@@ -5,7 +5,6 @@ import { ORDER_QUEUE_NAME } from '../infrastructure/queue/order.queue';
 import { MockDexRouter } from '../infrastructure/dex-router/mock-dex.router';
 import { publishOrderUpdate } from '../infrastructure/redis/publisher';
 import { OrderJobData } from '../core/entities/order.entity';
-// import { Prisma } from '../../generated/prisma/client'
 import { OrderStatus } from '../../generated/prisma/enums';
 
 const router = new MockDexRouter();

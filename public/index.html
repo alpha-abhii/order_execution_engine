@@ -1,17 +1,43 @@
 <!DOCTYPE html>
 <html>
+
 <head>
     <title>Order Execution Monitor</title>
     <style>
-        body { font-family: monospace; padding: 20px; background: #1a1a1a; color: #0f0; }
-        .box { border: 1px solid #333; padding: 20px; margin-bottom: 20px; }
-        button { padding: 10px 20px; cursor: pointer; background: #0f0; border: none; font-weight: bold; }
-        #logs { height: 300px; overflow-y: scroll; border: 1px solid #333; padding: 10px; background: #000; }
+        body {
+            font-family: monospace;
+            padding: 20px;
+            background: #1a1a1a;
+            color: #0f0;
+        }
+
+        .box {
+            border: 1px solid #333;
+            padding: 20px;
+            margin-bottom: 20px;
+        }
+
+        button {
+            padding: 10px 20px;
+            cursor: pointer;
+            background: #0f0;
+            border: none;
+            font-weight: bold;
+        }
+
+        #logs {
+            height: 300px;
+            overflow-y: scroll;
+            border: 1px solid #333;
+            padding: 10px;
+            background: #000;
+        }
     </style>
 </head>
+
 <body>
     <h1>🚀 Order Execution Engine</h1>
-    
+
     <div class="box">
         <h3>1. Submit Order</h3>
         <button onclick="submitOrder()">Buy 10 SOL</button>
@@ -27,26 +53,39 @@
         async function submitOrder() {
             const logs = document.getElementById('logs');
             logs.innerHTML = 'Submitting...<br>';
-            
-            // 1. Call API
-            const res = await fetch('http://localhost:3000/api/orders/execute', {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ inputToken: 'SOL', outputToken: 'USDC', amount: 10 })
-            });
-            const data = await res.json();
-            document.getElementById('orderId').innerText = data.orderId;
-            
-            // 2. Connect WebSocket
-            logs.innerHTML += `Connected to WS for ${data.orderId}...<br>`;
-            const ws = new WebSocket(`ws://localhost:3000/ws?orderId=${data.orderId}`);
-            
-            ws.onmessage = (event) => {
-                const msg = JSON.parse(event.data);
-                const color = msg.status === 'confirmed' ? '#0f0' : '#fff';
-                logs.innerHTML += `<div style="color:${color}">[${msg.status.toUpperCase()}] ${JSON.stringify(msg)}</div>`;
-            };
+
+            const API_URL = '/api/orders/execute';
+
+            const protocol = window.location.protocol === 'https:' ? 'wss:' : 'ws:';
+            const host = window.location.host;
+
+            try {
+                // 1. Call API (Relative path)
+                const res = await fetch(API_URL, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ inputToken: 'SOL', outputToken: 'USDC', amount: 10 })
+                });
+                const data = await res.json();
+
+                if (res.status !== 201) throw new Error(data.message || 'Failed');
+
+                document.getElementById('orderId').innerText = data.orderId;
+
+                // 2. Connect WebSocket (Dynamic Host)
+                logs.innerHTML += `Connected to WS for ${data.orderId}...<br>`;
+                const ws = new WebSocket(`${protocol}//${host}/ws?orderId=${data.orderId}`);
+
+                ws.onmessage = (event) => {
+                    const msg = JSON.parse(event.data);
+                    const color = msg.status === 'confirmed' ? '#0f0' : '#fff';
+                    logs.innerHTML += `<div style="color:${color}">[${msg.status.toUpperCase()}] ${JSON.stringify(msg)}</div>`;
+                };
+            } catch (e) {
+                logs.innerHTML += `<div style="color:red">Error: ${e.message}</div>`;
+            }
         }
     </script>
 </body>
+
 </html>
